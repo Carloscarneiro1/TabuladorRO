@@ -187,7 +187,7 @@
         <div>
           <div class="panel-tag">Eventos</div>
           <h3>Escolha o evento para entrar</h3>
-          <p>Mostra quantos ROs existem no <b>Evento 1</b> (Ult Sts = 1) e no <b>Evento 2</b> (Ult Sts = 2). Ao entrar, você verá a lista de ROs do evento e poderá registrar o follow-up.</p>
+          <p>Mostra quantos ROs existem no <b>Evento 1</b> (Ult Sts = 1) e no <b>Evento 2</b> (Ult Sts = 2). Ao entrar, você verá o tabulador em cima e o detalhamento (lista de ROs) embaixo.</p>
         </div>
         <div class="row">
           <span class="pill">Carregado: <span id="loadState" class="mono">—</span></span>
@@ -202,7 +202,7 @@
                 <div class="card-label">Evento 1</div>
                 <div class="hint">Ult Sts = 1</div>
               </div>
-              <span class="pill">Lista + tabulador</span>
+              <span class="pill">Tabulador + lista</span>
             </div>
             <div class="card-value" id="countEvt1">0</div>
             <div class="row" style="justify-content:flex-start;">
@@ -219,7 +219,7 @@
                 <div class="card-label">Evento 2</div>
                 <div class="hint">Ult Sts = 2</div>
               </div>
-              <span class="pill">Lista + tabulador</span>
+              <span class="pill">Tabulador + lista</span>
             </div>
             <div class="card-value" id="countEvt2">0</div>
             <div class="row" style="justify-content:flex-start;">
@@ -235,12 +235,11 @@
     <div class="panel hide" id="workPanel">
       <div class="panel-header">
         <div>
-          <div class="panel-tag">Detalhamento</div>
-          <h3 id="workTitle">Reclamações — visão detalhada</h3>
+          <div class="panel-tag">Workspace</div>
+          <h3 id="workTitle">Registro de follow-up</h3>
           <p>
-            Pesquise por <b>Nº RO</b>, clique na linha para carregar no formulário e registre o follow-up.
+            Use o tabulador em cima para registrar. A lista (detalhamento) fica embaixo para você pesquisar e clicar.
             O campo <b>Qtd FP</b> é a soma de quantos registros existem para a mesma RO no <b>registros.csv</b>.
-            <b>Obs.:</b> o detalhamento aparece <b>em cima e embaixo</b>.
           </p>
         </div>
         <div class="row">
@@ -249,43 +248,13 @@
         </div>
       </div>
 
-      <div class="search-row">
-        <input id="searchRO" class="search-input" type="search" placeholder="Pesquisar por Nº RO (ou Cliente/Produto/Motivo/Situação)..." autocomplete="off" />
-        <button class="btn" id="clearSearch"><span class="btn-icon">✖</span>Limpar</button>
-        <span class="hint" id="resultHint"></span>
-      </div>
-
-      <!-- DETALHAMENTO (TOPO) -->
-      <div class="table-wrapper" style="margin-top:10px;">
-        <div class="table-scroll">
-          <table id="tabelaRO">
-            <thead>
-              <tr>
-                <th>Nº RO</th>
-                <th>Cliente</th>
-                <th>Produto</th>
-                <th>Data Abertura</th>
-                <th>Motivo</th>
-                <th>Situação Atual RO</th>
-                <th>Qtd FP (overlay)</th>
-                <th>Último FP (overlay)</th>
-                <th>Coment. Qualidade (overlay)</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div style="height:12px"></div>
-
-      <!-- TABULADOR -->
+      <!-- TABULADOR (EM CIMA) -->
       <div class="panel" style="margin-bottom:16px;">
         <div class="panel-header">
           <div>
             <div class="panel-tag">Tabulador</div>
             <h3>Registrar follow-up</h3>
-            <p>Selecione uma RO na tabela. Depois preencha e clique em <b>Salvar registro</b>.</p>
+            <p>Selecione uma RO pelo campo <b>Nº RO</b> (lista) ou clique em uma linha no detalhamento embaixo. Depois preencha e clique em <b>Salvar registro</b>.</p>
           </div>
           <div class="row">
             <span class="pill">Status do token: <b id="tokenState" class="warn">não configurado</b></span>
@@ -295,19 +264,19 @@
         <div class="grid-2">
           <div class="field">
             <label>Nº RO (pesquisa principal)</label>
-            <input id="f_ro" type="text" placeholder="Clique em um RO na tabela..." readonly />
+            <input id="f_ro" type="text" placeholder="Digite/Selecione a RO..." list="rosList" autocomplete="off" />
+            <datalist id="rosList"></datalist>
           </div>
 
           <div class="field">
             <label>Cliente (pode vir em branco no Evento 1)</label>
-            <input id="f_cliente" type="text" placeholder="Cliente" list="clientesList" />
+            <input id="f_cliente" type="text" placeholder="Cliente" list="clientesList" autocomplete="off" />
             <datalist id="clientesList"></datalist>
           </div>
 
           <div class="field">
             <label>Produto (árvore/decisão: lista fixa)</label>
-            <input id="f_produto" type="text" placeholder="Produto" list="produtosList" />
-            <datalist id="produtosList"></datalist>
+            <select id="f_produto"></select>
           </div>
 
           <div class="field">
@@ -342,22 +311,27 @@
         </div>
       </div>
 
-      <!-- DETALHAMENTO (INFERIOR) -->
+      <!-- DETALHAMENTO (APENAS 1, EMBAIXO) -->
       <div class="panel" style="margin-bottom:0;">
         <div class="panel-header">
           <div>
             <div class="panel-tag">Detalhamento</div>
-            <h3>Reclamações — visão detalhada (inferior)</h3>
-            <p>Mesmo detalhamento do topo (útil para ver a lista após registrar).</p>
+            <h3>Reclamações — visão detalhada</h3>
+            <p>Pesquise e clique na RO para carregar no tabulador. O overlay mostra <b>Qtd FP</b>, <b>Último FP</b> e <b>Coment.</b> do último registro.</p>
           </div>
           <div class="row">
-            <span class="pill">Selecionada: <b id="selLabel">—</b></span>
+            <span class="pill">Registros: <b id="resultHint">—</b></span>
           </div>
         </div>
 
-        <div class="table-wrapper">
+        <div class="search-row">
+          <input id="searchRO" class="search-input" type="search" placeholder="Pesquisar por Nº RO (ou Cliente/Produto/Motivo/Situação)..." autocomplete="off" />
+          <button class="btn" id="clearSearch"><span class="btn-icon">✖</span>Limpar</button>
+        </div>
+
+        <div class="table-wrapper" style="margin-top:10px;">
           <div class="table-scroll">
-            <table id="tabelaROBottom">
+            <table id="tabelaRO">
               <thead>
                 <tr>
                   <th>Nº RO</th>
@@ -376,7 +350,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <!-- MODAL TOKEN -->
@@ -408,7 +381,7 @@
           </div>
           <div class="field" style="grid-column:1/-1;">
             <label>Token (Fine-grained PAT) — NÃO compartilhe</label>
-            <input id="cfg_token" type="password" placeholder="ghp_... / github_pat_..." />
+            <input id="cfg_token" type="password" placeholder="github_pat_..." />
             <div class="hint">Permissões mínimas: repo (apenas esse repo) + <b>Contents Read/Write</b>.</div>
           </div>
           <div class="field">
@@ -477,6 +450,7 @@
     const state = {
       dados: [],
       dadosEvento: [],
+      dadosByRO: {},
       registros: [],
       registrosByRO: {}, // { ro: {count, lastDateISO, lastDateBR, lastSituacao, lastComent, lastCliente, lastProduto} }
       evento: null,
@@ -575,9 +549,14 @@
     // =========================
     async function loadAll(){
       document.getElementById("loadState").textContent = "carregando...";
-
       const baseCSV = await fetch(DASHBOARD_CSV_URL).then(r=>r.text());
       state.dados = parseBaseDados(baseCSV);
+
+      // index por RO
+      state.dadosByRO = {};
+      state.dados.forEach(r=>{
+        if(r?.numeroRO) state.dadosByRO[String(r.numeroRO).trim()] = r;
+      });
 
       const registrosCSV = await fetch(resolveRegistrosRawURL()).then(r=>r.ok ? r.text() : "").catch(()=> "");
       state.registros = parseRegistros(registrosCSV);
@@ -654,7 +633,6 @@
 
       const delim = linhas[0].includes(";") ? ";" : ",";
       const header = parseCSVLine(linhas[0], delim).map(limparCampo).map(normCol);
-
       const isHeader = header.includes("numeroro") || header.includes("timestampiso");
       const dataLines = isHeader ? linhas.slice(1) : linhas;
 
@@ -696,7 +674,7 @@
         const iso = r.ultFP_iso || "";
         const ts  = r.timestampISO || "";
         const kdate = iso || ts;
-        const cur = map[ro].lastTS || "";
+        const cur = map[ro].lastDateISO || map[ro].lastTS || "";
 
         if(!cur || (kdate && kdate > cur)){
           map[ro].lastDateISO = iso || map[ro].lastDateISO;
@@ -738,7 +716,36 @@
       state.evento = null;
       state.dadosEvento = [];
       clearForm();
-      updateSelLabel();
+    }
+
+    function montarSelectFixos(){
+      // Produto (fixo)
+      const selProd = document.getElementById("f_produto");
+      selProd.innerHTML = "";
+      const p0 = document.createElement("option");
+      p0.value = "";
+      p0.textContent = "Selecione...";
+      selProd.appendChild(p0);
+      PRODUTOS_FIXOS.forEach(p=>{
+        const o = document.createElement("option");
+        o.value = p;
+        o.textContent = p;
+        selProd.appendChild(o);
+      });
+
+      // Situação (fixo)
+      const selSit = document.getElementById("f_situacao");
+      selSit.innerHTML = "";
+      const s0 = document.createElement("option");
+      s0.value = "";
+      s0.textContent = "Selecione...";
+      selSit.appendChild(s0);
+      SITUACOES_FIXAS.forEach(s=>{
+        const o = document.createElement("option");
+        o.value = s;
+        o.textContent = s;
+        selSit.appendChild(o);
+      });
     }
 
     function enterEvento(evt){
@@ -746,60 +753,53 @@
       homePanel.classList.add("hide");
       workPanel.classList.remove("hide");
       document.getElementById("eventoLabel").textContent = `Ult Sts = ${evt}`;
-      document.getElementById("workTitle").textContent = `Reclamações — visão detalhada (Evento ${evt})`;
+      document.getElementById("workTitle").textContent = `Registro de follow-up (Evento ${evt})`;
 
       state.dadosEvento = state.dados.filter(r => Number(r.ultSts) === Number(evt));
 
-      // ✅ clientes dinâmicos (do evento)
+      // ✅ clientes (do DASH por evento) como sugestão
       const clientes = [...new Set(state.dadosEvento.map(r => r.cliente).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
       document.getElementById("clientesList").innerHTML = clientes.map(c => `<option value="${c}"></option>`).join("");
 
-      // ✅ produto FIXO (como você pediu)
-      document.getElementById("produtosList").innerHTML = PRODUTOS_FIXOS.map(p => `<option value="${p}"></option>`).join("");
+      // ✅ lista de ROs (para selecionar no tabulador sem rolar)
+      const ros = [...new Set(state.dadosEvento.map(r => r.numeroRO).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+      document.getElementById("rosList").innerHTML = ros.map(ro => `<option value="${ro}"></option>`).join("");
 
-      // ✅ situação FIXA (como você pediu)
-      const sel = document.getElementById("f_situacao");
-      sel.innerHTML = "";
-      const opt0 = document.createElement("option");
-      opt0.value = "";
-      opt0.textContent = "Selecione...";
-      sel.appendChild(opt0);
-      SITUACOES_FIXAS.forEach(s=>{
-        const o = document.createElement("option");
-        o.value = s;
-        o.textContent = s;
-        sel.appendChild(o);
-      });
+      // ✅ selects fixos
+      montarSelectFixos();
 
       // render
       state.filtro = "";
       document.getElementById("searchRO").value = "";
       renderTabela();
       setTokenState();
+
+      // ao digitar/selecionar RO no input, carregar dados
+      document.getElementById("f_ro").onchange = ()=> tryLoadByROInput();
+      document.getElementById("f_ro").onblur = ()=> tryLoadByROInput();
     }
 
     // =========================
     // TABELA + SELEÇÃO
     // =========================
     let selectedRO = "";
-
-    function updateSelLabel(){
-      document.getElementById("selLabel").textContent = selectedRO ? selectedRO : "—";
-    }
-
     function renderTabela(){
-      const tbodyTop = document.querySelector("#tabelaRO tbody");
-      const tbodyBottom = document.querySelector("#tabelaROBottom tbody");
-      tbodyTop.innerHTML = "";
-      tbodyBottom.innerHTML = "";
+      const tbody = document.querySelector("#tabelaRO tbody");
+      tbody.innerHTML = "";
 
       const q = normTxt(state.filtro);
       let base = [...state.dadosEvento];
 
       if(q){
         base = base.filter(r=>{
-          const alvo = [r.numeroRO,r.cliente,r.produto,r.motivo,r.situacaoRO]
-            .map(normTxt).join(" | ");
+          const overlay = state.registrosByRO[r.numeroRO] || null;
+          const alvo = [
+            r.numeroRO,
+            overlay?.lastCliente || r.cliente,
+            overlay?.lastProduto || r.produto,
+            r.motivo,
+            overlay?.lastSituacao || r.situacaoRO
+          ].map(normTxt).join(" | ");
           return alvo.includes(q);
         });
       }
@@ -807,56 +807,48 @@
       document.getElementById("resultHint").textContent = `${PTBR.format(base.length)} registro(s) no evento após filtro`;
 
       base.forEach(r=>{
-        const trTop = buildRow(r);
-        const trBottom = buildRow(r);
+        const ro = r.numeroRO || "";
+        const overlay = state.registrosByRO[ro] || null;
 
-        tbodyTop.appendChild(trTop);
-        tbodyBottom.appendChild(trBottom);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="mono">${ro || "-"}</td>
+          <td>${(overlay?.lastCliente || r.cliente || "-")}</td>
+          <td>${(overlay?.lastProduto || r.produto || "-")}</td>
+          <td>${r.dataAbertura || "-"}</td>
+          <td>${r.motivo || "-"}</td>
+          <td><span class="status-pill">${(overlay?.lastSituacao || r.situacaoRO || "-")}</span></td>
+          <td class="mono">${PTBR.format(overlay?.count || 0)}</td>
+          <td>${overlay?.lastDateBR || "-"}</td>
+          <td>${overlay?.lastComent ? overlay.lastComent : "-"}</td>
+        `;
+        tr.addEventListener("click", ()=>{
+          document.querySelectorAll("#tabelaRO tbody tr").forEach(x=>x.classList.remove("selected"));
+          tr.classList.add("selected");
+          loadROtoForm(r);
+          // opcional: sobe pro topo (tabulador) ao clicar
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        tbody.appendChild(tr);
       });
-
-      updateSelLabel();
     }
 
-    function buildRow(r){
-      const ro = r.numeroRO || "";
-      const overlay = state.registrosByRO[ro] || null;
+    function tryLoadByROInput(){
+      const ro = limparCampo(document.getElementById("f_ro").value);
+      if(!ro) return;
 
-      const tr = document.createElement("tr");
-      if(ro && ro === selectedRO) tr.classList.add("selected");
-
-      tr.innerHTML = `
-        <td class="mono">${ro || "-"}</td>
-        <td>${(overlay?.lastCliente || r.cliente || "-")}</td>
-        <td>${(overlay?.lastProduto || r.produto || "-")}</td>
-        <td>${r.dataAbertura || "-"}</td>
-        <td>${r.motivo || "-"}</td>
-        <td><span class="status-pill">${(overlay?.lastSituacao || r.situacaoRO || "-")}</span></td>
-        <td class="mono">${PTBR.format(overlay?.count || 0)}</td>
-        <td>${overlay?.lastDateBR || "-"}</td>
-        <td>${overlay?.lastComent ? overlay.lastComent : "-"}</td>
-      `;
-
-      tr.addEventListener("click", ()=>{
-        selectedRO = ro;
-        markSelectedRows();
+      // busca RO dentro do evento atual
+      const r = state.dadosEvento.find(x => String(x.numeroRO).trim() === ro);
+      if(r){
         loadROtoForm(r);
-        updateSelLabel();
-      });
+        return;
+      }
 
-      return tr;
-    }
-
-    function markSelectedRows(){
-      document.querySelectorAll("#tabelaRO tbody tr, #tabelaROBottom tbody tr")
-        .forEach(x=>x.classList.remove("selected"));
-
-      // marca os dois (topo e baixo) pela primeira célula (Nº RO)
-      const allRows = document.querySelectorAll("#tabelaRO tbody tr, #tabelaROBottom tbody tr");
-      allRows.forEach(row=>{
-        const roCell = row.querySelector("td");
-        const ro = roCell ? roCell.textContent.trim() : "";
-        if(ro && ro === selectedRO) row.classList.add("selected");
-      });
+      // se não achar, tenta pelo index geral (mas só preenche o que der)
+      const any = state.dadosByRO[ro];
+      if(any){
+        loadROtoForm(any);
+      }
     }
 
     function loadROtoForm(r){
@@ -864,16 +856,23 @@
       const overlay = state.registrosByRO[selectedRO] || null;
 
       document.getElementById("f_ro").value = selectedRO;
-      document.getElementById("f_cliente").value = (overlay?.lastCliente || r.cliente || "");
-      document.getElementById("f_produto").value = (overlay?.lastProduto || r.produto || "");
-      document.getElementById("f_situacao").value = (overlay?.lastSituacao || r.situacaoRO || "");
+
+      // cliente/produto: overlay tem prioridade; se vazio no evento1, deixa branco pra preencher
+      const cliente = (overlay?.lastCliente || r.cliente || "");
+      const produto = (overlay?.lastProduto || r.produto || "");
+
+      document.getElementById("f_cliente").value = cliente;
+      document.getElementById("f_produto").value = produto;
+
+      // situação: se overlay tiver, usa. Senão, tenta casar com lista fixa.
+      const sit = (overlay?.lastSituacao || r.situacaoRO || "");
+      document.getElementById("f_situacao").value = sit;
+
       document.getElementById("f_qtdfp").value = String(overlay?.count || 0);
-
       document.getElementById("f_ultfp").value = overlay?.lastDateISO || "";
-      document.getElementById("f_coment").value = "";
 
+      document.getElementById("f_coment").value = "";
       document.getElementById("saveHint").textContent = `RO selecionada: ${selectedRO} · Evento ${state.evento}`;
-      updateSelLabel();
     }
 
     function clearForm(){
@@ -900,7 +899,7 @@
 
       const ro = limparCampo(document.getElementById("f_ro").value);
       if(!ro){
-        document.getElementById("saveHint").innerHTML = `<span class="danger">Selecione uma RO na tabela primeiro.</span>`;
+        document.getElementById("saveHint").innerHTML = `<span class="danger">Selecione uma RO primeiro.</span>`;
         return;
       }
 
@@ -925,16 +924,14 @@
         safeCSV(coment)
       ].join(";");
 
+      // sem token: orienta export manual
       if(!cfg.token){
         document.getElementById("saveHint").innerHTML =
           `<span class="warn">Token não configurado.</span> Use <b>Exportar registros (CSV)</b> e faça upload manual do arquivo <b>${cfg.path}</b> no repo <b>${cfg.owner}/${cfg.repo}</b>.`;
-
         state.registros.push({ timestampISO, evento, numeroRO: ro, cliente, produto, situacaoRO: situacao, ultFP_iso: ultfpISO, coment });
         state.registrosByRO = indexRegistros(state.registros);
-
         renderTabela();
         document.getElementById("f_qtdfp").value = String(state.registrosByRO[ro]?.count || 0);
-        markSelectedRows();
         return;
       }
 
@@ -943,7 +940,6 @@
 
       try{
         const apiBase = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
-
         let currentContent = "";
         let sha = null;
 
@@ -972,7 +968,7 @@
           next = header + "\n" + newLine + "\n";
         }else{
           const firstLine = next.split(/\r?\n/)[0] || "";
-          if(!normTxt(firstLine).includes("timestampiso") && !normTxt(firstLine).includes("numeroro")){
+          if(!normTxt(firstLine).includes("numeroro") && !normTxt(firstLine).includes("timestampiso")){
             next = header + "\n" + next + "\n";
           }else{
             next += "\n";
@@ -1010,7 +1006,6 @@
 
         document.getElementById("f_coment").value = "";
         renderTabela();
-        markSelectedRows();
 
       }catch(err){
         console.error(err);
