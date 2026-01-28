@@ -150,6 +150,66 @@
     .warn{color:var(--warn)}
     .hide{display:none!important}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+
+    /* HERO IMAGEM (HOME) */
+    .hero{
+      margin-top:14px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(148,163,184,.25);
+      box-shadow:0 18px 40px rgba(15,23,42,.55);
+      position:relative;
+      background:rgba(2,6,23,.6);
+      min-height:220px;
+    }
+    body.light .hero{box-shadow:0 16px 30px rgba(15,23,42,.12)}
+    .hero img{
+      width:100%;
+      height:280px;
+      object-fit:cover;
+      display:block;
+      filter:saturate(1.05) contrast(1.02);
+      opacity:.92;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(56,189,248,.22), transparent 55%),
+        linear-gradient(to top, rgba(2,6,23,.88) 0%, rgba(2,6,23,.35) 45%, rgba(2,6,23,.12) 100%);
+      pointer-events:none;
+    }
+    .hero-content{
+      position:absolute;
+      left:16px;
+      bottom:14px;
+      right:16px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-end;
+      z-index:1;
+      flex-wrap:wrap;
+    }
+    .hero-title{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      max-width:760px;
+    }
+    .hero-title h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.02em;
+    }
+    .hero-title p{
+      margin:0;
+      font-size:11px;
+      color:var(--text-muted);
+      line-height:1.35;
+    }
+    .hero-badges{display:flex;gap:8px;flex-wrap:wrap}
   </style>
 </head>
 
@@ -208,7 +268,7 @@
             <div class="row" style="justify-content:flex-start;">
               <button class="btn" id="enterEvt1"><span class="btn-icon">➡️</span>Entrar no Evento 1</button>
             </div>
-            <div class="hint">Normalmente Cliente/Produto podem vir em branco — você preenche aqui e fica registrado no overlay.</div>
+            <div class="hint">Após registrar no Evento 1, a RO passa a contar como Evento 2 no Tabulador.</div>
           </div>
         </div>
 
@@ -225,7 +285,26 @@
             <div class="row" style="justify-content:flex-start;">
               <button class="btn" id="enterEvt2"><span class="btn-icon">➡️</span>Entrar no Evento 2</button>
             </div>
-            <div class="hint">Evento do seu Dashboard atual (você fixou Ult Sts = 2). Aqui você registra e o Dashboard atualiza se estiver lendo o overlay.</div>
+            <div class="hint">No Evento 2, o Tabulador usa o que já existe no <b>dados.csv</b> (Qtd FP / Último FP / Coment.) e soma com novos registros.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IMAGEM (área marcada em vermelho) -->
+      <div class="hero" aria-label="Estoque de vidros - capa">
+        <!-- ✅ coloque o arquivo banner_vidros.png na raiz do repo do Tabulador -->
+        <img src="banner_vidros.png" alt="Estoque de pilhas de vidro" />
+        <div class="hero-content">
+          <div class="hero-title">
+            <h2>Gestão de reclamações e follow-up — visão operacional</h2>
+            <p>
+              Visualize por evento, selecione a RO e registre o andamento. Mantém histórico em <b>registros.csv</b> e permite que o Dashboard consuma as atualizações.
+            </p>
+          </div>
+          <div class="hero-badges">
+            <span class="pill">📦 Estoque</span>
+            <span class="pill">🧾 ROs</span>
+            <span class="pill">🧭 Follow-up</span>
           </div>
         </div>
       </div>
@@ -233,91 +312,79 @@
 
     <!-- WORKSPACE -->
     <div class="panel hide" id="workPanel">
+      <!-- TABULADOR EM CIMA -->
       <div class="panel-header">
         <div>
-          <div class="panel-tag">Workspace</div>
-          <h3 id="workTitle">Registro de follow-up</h3>
-          <p>
-            Use o tabulador em cima para registrar. A lista (detalhamento) fica embaixo para você pesquisar e clicar.
-            O campo <b>Qtd FP</b> é a soma de quantos registros existem para a mesma RO no <b>registros.csv</b>.
-          </p>
+          <div class="panel-tag">Tabulador</div>
+          <h3>Registrar follow-up</h3>
+          <p>Selecione uma RO na lista abaixo. No <b>Evento 2</b>, o formulário já vem preenchido com o que existe no <b>dados.csv</b> (quando houver) e você pode ajustar antes de salvar.</p>
         </div>
         <div class="row">
           <button class="btn" id="btnVoltar"><span class="btn-icon">⬅️</span>Voltar</button>
           <span class="pill">Evento: <b id="eventoLabel">—</b></span>
+          <span class="pill">Token: <b id="tokenState" class="warn">não configurado</b></span>
         </div>
       </div>
 
-      <!-- TABULADOR (EM CIMA) -->
-      <div class="panel" style="margin-bottom:16px;">
-        <div class="panel-header">
-          <div>
-            <div class="panel-tag">Tabulador</div>
-            <h3>Registrar follow-up</h3>
-            <p>Selecione uma RO pelo campo <b>Nº RO</b> (lista) ou clique em uma linha no detalhamento embaixo. Depois preencha e clique em <b>Salvar registro</b>.</p>
-          </div>
-          <div class="row">
-            <span class="pill">Status do token: <b id="tokenState" class="warn">não configurado</b></span>
-          </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Nº RO (seleção pela lista)</label>
+          <input id="f_ro" type="text" placeholder="Clique em um RO na lista..." readonly />
         </div>
 
-        <div class="grid-2">
-          <div class="field">
-            <label>Nº RO (pesquisa principal)</label>
-            <input id="f_ro" type="text" placeholder="Digite/Selecione a RO..." list="rosList" autocomplete="off" />
-            <datalist id="rosList"></datalist>
-          </div>
-
-          <div class="field">
-            <label>Cliente (pode vir em branco no Evento 1)</label>
-            <input id="f_cliente" type="text" placeholder="Cliente" list="clientesList" autocomplete="off" />
-            <datalist id="clientesList"></datalist>
-          </div>
-
-          <div class="field">
-            <label>Produto (árvore/decisão: lista fixa)</label>
-            <select id="f_produto"></select>
-          </div>
-
-          <div class="field">
-            <label>Situação Atual RO (árvore/decisão: lista fixa)</label>
-            <select id="f_situacao"></select>
-          </div>
-
-          <div class="field">
-            <label>Qtd FP (soma de registros nesta RO)</label>
-            <input id="f_qtdfp" type="text" placeholder="0" readonly />
-            <div class="hint">Calculado pelo <b>registros.csv</b> (quantas vezes você registrou esse RO).</div>
-          </div>
-
-          <div class="field">
-            <label>Último FP (data do contato)</label>
-            <input id="f_ultfp" type="date" />
-            <div class="hint">O Dashboard pode mostrar essa data como “Último FP”.</div>
-          </div>
-
-          <div class="field" style="grid-column:1/-1;">
-            <label>Coment. Qualidade (observações / andamento)</label>
-            <textarea id="f_coment" placeholder="Digite aqui as observações..."></textarea>
-          </div>
+        <div class="field">
+          <label>Cliente</label>
+          <input id="f_cliente" type="text" placeholder="Cliente" list="clientesList" />
+          <datalist id="clientesList"></datalist>
         </div>
 
-        <div class="row" style="justify-content:space-between;margin-top:12px;">
-          <div class="hint" id="saveHint">—</div>
-          <div class="row">
-            <button class="btn" id="btnExport"><span class="btn-icon">⬇️</span>Exportar registros (CSV)</button>
-            <button class="btn" id="btnSave"><span class="btn-icon">💾</span>Salvar registro</button>
-          </div>
+        <div class="field">
+          <label>Produto (árvore/decisão: lista fixa)</label>
+          <input id="f_produto" type="text" placeholder="Produto" list="produtosList" />
+          <datalist id="produtosList"></datalist>
+        </div>
+
+        <div class="field">
+          <label>Situação Atual RO (árvore/decisão: lista fixa)</label>
+          <select id="f_situacao"></select>
+        </div>
+
+        <div class="field">
+          <label>Qtd FP (base + registros)</label>
+          <input id="f_qtdfp" type="text" placeholder="0" readonly />
+          <div class="hint">Evento 2: <b>Qtd FP do dados.csv</b> + registros do overlay. Evento 1: apenas overlay.</div>
+        </div>
+
+        <div class="field">
+          <label>Último FP (data do contato)</label>
+          <input id="f_ultfp" type="date" />
+          <div class="hint">No Evento 2, vem preenchido do <b>dados.csv</b> se existir (e você pode alterar).</div>
+        </div>
+
+        <div class="field" style="grid-column:1/-1;">
+          <label>Coment. Qualidade (observações / andamento)</label>
+          <textarea id="f_coment" placeholder="Digite aqui as observações..."></textarea>
+          <div class="hint">No Evento 2, pode vir preenchido do <b>dados.csv</b> (e/ou overlay).</div>
         </div>
       </div>
 
-      <!-- DETALHAMENTO (APENAS 1, EMBAIXO) -->
+      <div class="row" style="justify-content:space-between;margin-top:12px;">
+        <div class="hint" id="saveHint">—</div>
+        <div class="row">
+          <button class="btn" id="btnExport"><span class="btn-icon">⬇️</span>Exportar registros (CSV)</button>
+          <button class="btn" id="btnSave"><span class="btn-icon">💾</span>Salvar registro</button>
+        </div>
+      </div>
+
+      <div style="height:14px"></div>
+
+      <!-- DETALHAMENTO EMBAIXO (apenas 1) -->
       <div class="panel" style="margin-bottom:0;">
         <div class="panel-header">
           <div>
             <div class="panel-tag">Detalhamento</div>
-            <h3>Reclamações — visão detalhada</h3>
-            <p>Pesquise e clique na RO para carregar no tabulador. O overlay mostra <b>Qtd FP</b>, <b>Último FP</b> e <b>Coment.</b> do último registro.</p>
+            <h3 id="workTitle">Reclamações — visão detalhada</h3>
+            <p>Pesquise por <b>Nº RO</b> (ou Cliente/Produto/Motivo/Situação). Clique na linha para carregar no tabulador acima.</p>
           </div>
           <div class="row">
             <span class="pill">Registros: <b id="resultHint">—</b></span>
@@ -340,9 +407,9 @@
                   <th>Data Abertura</th>
                   <th>Motivo</th>
                   <th>Situação Atual RO</th>
-                  <th>Qtd FP (overlay)</th>
-                  <th>Último FP (overlay)</th>
-                  <th>Coment. Qualidade (overlay)</th>
+                  <th>Qtd FP</th>
+                  <th>Último FP</th>
+                  <th>Coment. Qualidade</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -381,7 +448,7 @@
           </div>
           <div class="field" style="grid-column:1/-1;">
             <label>Token (Fine-grained PAT) — NÃO compartilhe</label>
-            <input id="cfg_token" type="password" placeholder="github_pat_..." />
+            <input id="cfg_token" type="password" placeholder="ghp_... / github_pat_..." />
             <div class="hint">Permissões mínimas: repo (apenas esse repo) + <b>Contents Read/Write</b>.</div>
           </div>
           <div class="field">
@@ -411,27 +478,15 @@
     // CONFIG (AJUSTE AQUI)
     // =========================
     const DASHBOARD_CSV_URL = "https://carloscarneiro1.github.io/Dashboard/dados.csv";
-
-    // Leitura do overlay (raw)
     const REGISTROS_RAW_URL_DEFAULT = "https://raw.githubusercontent.com/carloscarneiro1/TabuladorRO/main/registros.csv";
 
-    // Gravação (GitHub API) - valores default (você pode mudar pelo modal)
     const DEFAULT_GH_OWNER = "carloscarneiro1";
     const DEFAULT_GH_REPO  = "TabuladorRO";
     const DEFAULT_GH_PATH  = "registros.csv";
     const DEFAULT_GH_BRANCH= "main";
 
-    // ✅ LISTAS FIXAS (como você pediu)
-    const PRODUTOS_FIXOS = [
-      "JACAREI-LAMINADO",
-      "JACAREI-METALIZADO",
-      "JACAREI-FLOAT I",
-      "JACAREI-FLOAT III",
-      "JACAREI-FLOAT V",
-      "LAMINADO EXTERNO"
-    ];
-
-    const SITUACOES_FIXAS = [
+    // ✅ LISTAS FIXAS (árvore/decisão)
+    const LISTA_SITUACAO_FIXA = [
       "Aguardando Cliente",
       "Aguardando Qualidade",
       "Aguardando Laboratório",
@@ -443,6 +498,15 @@
       "Aguardando Linha 5"
     ];
 
+    const LISTA_PRODUTOS_FIXA = [
+      "JACAREI-LAMINADO",
+      "JACAREI-METALIZADO",
+      "JACAREI-FLOAT I",
+      "JACAREI-FLOAT III",
+      "JACAREI-FLOAT V",
+      "LAMINADO EXTERNO"
+    ];
+
     // =========================
     // ESTADO
     // =========================
@@ -450,11 +514,11 @@
     const state = {
       dados: [],
       dadosEvento: [],
-      dadosByRO: {},
       registros: [],
-      registrosByRO: {}, // { ro: {count, lastDateISO, lastDateBR, lastSituacao, lastComent, lastCliente, lastProduto} }
+      registrosByRO: {},
       evento: null,
-      filtro: ""
+      filtro: "",
+      movedTo2: {} // {ro:true} -> RO que foi registrada no Evento 1 e "passa" a aparecer como Evento 2 no Tabulador
     };
 
     // =========================
@@ -497,6 +561,15 @@
       out.push(cur);
       return out;
     }
+    function parseDataBRtoISO(br){
+      if(!br) return "";
+      const p = String(br).split(/[\/\-]/);
+      if(p.length < 3) return "";
+      const d = String(p[0]).padStart(2,"0");
+      const m = String(p[1]).padStart(2,"0");
+      const y = String(p[2]).padStart(4,"0");
+      return `${y}-${m}-${d}`;
+    }
     function isoToBR(iso){
       if(!iso) return "";
       const [y,m,d] = String(iso).split("-");
@@ -509,6 +582,10 @@
         return `"${s.replace(/"/g,'""')}"`;
       }
       return s;
+    }
+    function n0(v){
+      const x = Number(String(v||"").replace(/[^\d\-.,]/g,"").replace(",","."));
+      return isNaN(x) ? 0 : x;
     }
 
     // =========================
@@ -545,27 +622,18 @@
     }
 
     // =========================
-    // LOAD BASE (dados.csv) + REGISTROS
+    // LOAD BASE + REGISTROS
     // =========================
     async function loadAll(){
       document.getElementById("loadState").textContent = "carregando...";
       const baseCSV = await fetch(DASHBOARD_CSV_URL).then(r=>r.text());
       state.dados = parseBaseDados(baseCSV);
 
-      // index por RO
-      state.dadosByRO = {};
-      state.dados.forEach(r=>{
-        if(r?.numeroRO) state.dadosByRO[String(r.numeroRO).trim()] = r;
-      });
-
       const registrosCSV = await fetch(resolveRegistrosRawURL()).then(r=>r.ok ? r.text() : "").catch(()=> "");
       state.registros = parseRegistros(registrosCSV);
       state.registrosByRO = indexRegistros(state.registros);
 
-      const evt1 = state.dados.filter(r => Number(r.ultSts) === 1);
-      const evt2 = state.dados.filter(r => Number(r.ultSts) === 2);
-      document.getElementById("countEvt1").textContent = PTBR.format(evt1.length);
-      document.getElementById("countEvt2").textContent = PTBR.format(evt2.length);
+      updateCountsHome();
 
       document.getElementById("loadState").textContent = "ok";
       setTokenState();
@@ -578,6 +646,19 @@
       const branch= cfg.branch|| DEFAULT_GH_BRANCH;
       const path  = cfg.path  || DEFAULT_GH_PATH;
       return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
+    }
+
+    function getEffectiveUltSts(row){
+      const ro = String(row.numeroRO || "").trim();
+      if(state.movedTo2[ro]) return 2;
+      return Number(row.ultSts);
+    }
+
+    function updateCountsHome(){
+      const evt1 = state.dados.filter(r => getEffectiveUltSts(r) === 1);
+      const evt2 = state.dados.filter(r => getEffectiveUltSts(r) === 2);
+      document.getElementById("countEvt1").textContent = PTBR.format(evt1.length);
+      document.getElementById("countEvt2").textContent = PTBR.format(evt2.length);
     }
 
     function parseBaseDados(csv){
@@ -614,12 +695,13 @@
         const situacaoRO   = get(cols, "Situação Atual RO","Situacao Atual RO","Situação RO","Status","Situacao") || "";
         const qtdFP        = get(cols, "Qtd FP","Quantidade FP") || "";
         const ultFP        = get(cols, "Último FP","Ultimo FP","Data Último FP","Data Ultimo FP") || "";
+        const comentQualidade = get(cols, "Coment. Qualidade","Coment Qualidade","Comentario Qualidade","Comentário Qualidade") || "";
 
         const ultStsRaw = get(cols, "Ult Sts","UltSts","Ult_Sts","Ult. Sts","Ultimo Status","Último Status");
         const ultSts = (ultStsRaw == null || ultStsRaw === "") ? null : parseInt(String(ultStsRaw).replace(/\D+/g,""), 10);
 
         if(!numeroRO) return null;
-        return { cliente, numeroRO, produto, dataAbertura, motivo, situacaoRO, qtdFP, ultFP, ultSts };
+        return { cliente, numeroRO, produto, dataAbertura, motivo, situacaoRO, qtdFP, ultFP, comentQualidade, ultSts };
       }).filter(Boolean);
     }
 
@@ -633,6 +715,7 @@
 
       const delim = linhas[0].includes(";") ? ";" : ",";
       const header = parseCSVLine(linhas[0], delim).map(limparCampo).map(normCol);
+
       const isHeader = header.includes("numeroro") || header.includes("timestampiso");
       const dataLines = isHeader ? linhas.slice(1) : linhas;
 
@@ -715,74 +798,80 @@
       workPanel.classList.add("hide");
       state.evento = null;
       state.dadosEvento = [];
+      state.filtro = "";
       clearForm();
     }
 
-    function montarSelectFixos(){
-      // Produto (fixo)
-      const selProd = document.getElementById("f_produto");
-      selProd.innerHTML = "";
-      const p0 = document.createElement("option");
-      p0.value = "";
-      p0.textContent = "Selecione...";
-      selProd.appendChild(p0);
-      PRODUTOS_FIXOS.forEach(p=>{
-        const o = document.createElement("option");
-        o.value = p;
-        o.textContent = p;
-        selProd.appendChild(o);
-      });
+    function mountFixas(){
+      // datalist produtos fixa
+      const produtosList = document.getElementById("produtosList");
+      produtosList.innerHTML = LISTA_PRODUTOS_FIXA.map(p => `<option value="${p}"></option>`).join("");
 
-      // Situação (fixo)
-      const selSit = document.getElementById("f_situacao");
-      selSit.innerHTML = "";
-      const s0 = document.createElement("option");
-      s0.value = "";
-      s0.textContent = "Selecione...";
-      selSit.appendChild(s0);
-      SITUACOES_FIXAS.forEach(s=>{
+      // select situacao fixa
+      const sel = document.getElementById("f_situacao");
+      sel.innerHTML = "";
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = "Selecione...";
+      sel.appendChild(opt0);
+      LISTA_SITUACAO_FIXA.forEach(s=>{
         const o = document.createElement("option");
         o.value = s;
         o.textContent = s;
-        selSit.appendChild(o);
+        sel.appendChild(o);
       });
     }
 
     function enterEvento(evt){
-      state.evento = evt;
+      state.evento = Number(evt);
       homePanel.classList.add("hide");
       workPanel.classList.remove("hide");
       document.getElementById("eventoLabel").textContent = `Ult Sts = ${evt}`;
-      document.getElementById("workTitle").textContent = `Registro de follow-up (Evento ${evt})`;
+      document.getElementById("workTitle").textContent = `Reclamações — visão detalhada (Evento ${evt})`;
 
-      state.dadosEvento = state.dados.filter(r => Number(r.ultSts) === Number(evt));
+      // aplica "passagem" do Evento 1 -> Evento 2 (somente no Tabulador)
+      state.dadosEvento = state.dados.filter(r => getEffectiveUltSts(r) === Number(evt));
 
-      // ✅ clientes (do DASH por evento) como sugestão
+      // clientes do evento (só sugestão)
       const clientes = [...new Set(state.dadosEvento.map(r => r.cliente).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-      document.getElementById("clientesList").innerHTML = clientes.map(c => `<option value="${c}"></option>`).join("");
+      const clientesList = document.getElementById("clientesList");
+      clientesList.innerHTML = clientes.map(c => `<option value="${c}"></option>`).join("");
 
-      // ✅ lista de ROs (para selecionar no tabulador sem rolar)
-      const ros = [...new Set(state.dadosEvento.map(r => r.numeroRO).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
-      document.getElementById("rosList").innerHTML = ros.map(ro => `<option value="${ro}"></option>`).join("");
+      mountFixas();
 
-      // ✅ selects fixos
-      montarSelectFixos();
-
-      // render
       state.filtro = "";
       document.getElementById("searchRO").value = "";
       renderTabela();
       setTokenState();
-
-      // ao digitar/selecionar RO no input, carregar dados
-      document.getElementById("f_ro").onchange = ()=> tryLoadByROInput();
-      document.getElementById("f_ro").onblur = ()=> tryLoadByROInput();
+      clearForm();
     }
 
     // =========================
     // TABELA + SELEÇÃO
     // =========================
     let selectedRO = "";
+
+    function qtdFPDisplay(row, overlay){
+      const overlayCount = overlay?.count || 0;
+      if(Number(state.evento) === 2){
+        const baseQtd = n0(row.qtdFP);
+        return baseQtd + overlayCount;
+      }
+      return overlayCount;
+    }
+
+    function ultFPDisplayBR(row, overlay){
+      if(overlay?.lastDateBR) return overlay.lastDateBR;
+      if(row.ultFP) return row.ultFP; // já vem BR no dados.csv
+      return "-";
+    }
+
+    function comentDisplay(row, overlay){
+      if(overlay?.lastComent) return overlay.lastComent;
+      if(Number(state.evento) === 2 && row.comentQualidade) return row.comentQualidade;
+      return "-";
+    }
+
     function renderTabela(){
       const tbody = document.querySelector("#tabelaRO tbody");
       tbody.innerHTML = "";
@@ -792,14 +881,8 @@
 
       if(q){
         base = base.filter(r=>{
-          const overlay = state.registrosByRO[r.numeroRO] || null;
-          const alvo = [
-            r.numeroRO,
-            overlay?.lastCliente || r.cliente,
-            overlay?.lastProduto || r.produto,
-            r.motivo,
-            overlay?.lastSituacao || r.situacaoRO
-          ].map(normTxt).join(" | ");
+          const alvo = [r.numeroRO,r.cliente,r.produto,r.motivo,r.situacaoRO,r.comentQualidade,r.qtdFP,r.ultFP]
+            .map(normTxt).join(" | ");
           return alvo.includes(q);
         });
       }
@@ -810,45 +893,34 @@
         const ro = r.numeroRO || "";
         const overlay = state.registrosByRO[ro] || null;
 
+        const clienteShow = (overlay?.lastCliente || r.cliente || "-");
+        const produtoShow = (overlay?.lastProduto || r.produto || "-");
+        const situacaoShow = (overlay?.lastSituacao || r.situacaoRO || "-");
+
+        const qtd = qtdFPDisplay(r, overlay);
+        const ultfp = ultFPDisplayBR(r, overlay);
+        const coment = comentDisplay(r, overlay);
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td class="mono">${ro || "-"}</td>
-          <td>${(overlay?.lastCliente || r.cliente || "-")}</td>
-          <td>${(overlay?.lastProduto || r.produto || "-")}</td>
+          <td>${clienteShow}</td>
+          <td>${produtoShow}</td>
           <td>${r.dataAbertura || "-"}</td>
           <td>${r.motivo || "-"}</td>
-          <td><span class="status-pill">${(overlay?.lastSituacao || r.situacaoRO || "-")}</span></td>
-          <td class="mono">${PTBR.format(overlay?.count || 0)}</td>
-          <td>${overlay?.lastDateBR || "-"}</td>
-          <td>${overlay?.lastComent ? overlay.lastComent : "-"}</td>
+          <td><span class="status-pill">${situacaoShow}</span></td>
+          <td class="mono">${PTBR.format(qtd)}</td>
+          <td>${ultfp}</td>
+          <td>${coment}</td>
         `;
         tr.addEventListener("click", ()=>{
           document.querySelectorAll("#tabelaRO tbody tr").forEach(x=>x.classList.remove("selected"));
           tr.classList.add("selected");
           loadROtoForm(r);
-          // opcional: sobe pro topo (tabulador) ao clicar
           window.scrollTo({ top: 0, behavior: "smooth" });
         });
         tbody.appendChild(tr);
       });
-    }
-
-    function tryLoadByROInput(){
-      const ro = limparCampo(document.getElementById("f_ro").value);
-      if(!ro) return;
-
-      // busca RO dentro do evento atual
-      const r = state.dadosEvento.find(x => String(x.numeroRO).trim() === ro);
-      if(r){
-        loadROtoForm(r);
-        return;
-      }
-
-      // se não achar, tenta pelo index geral (mas só preenche o que der)
-      const any = state.dadosByRO[ro];
-      if(any){
-        loadROtoForm(any);
-      }
     }
 
     function loadROtoForm(r){
@@ -857,21 +929,25 @@
 
       document.getElementById("f_ro").value = selectedRO;
 
-      // cliente/produto: overlay tem prioridade; se vazio no evento1, deixa branco pra preencher
-      const cliente = (overlay?.lastCliente || r.cliente || "");
-      const produto = (overlay?.lastProduto || r.produto || "");
+      // Cliente/Produto/Situação: overlay > base
+      document.getElementById("f_cliente").value = (overlay?.lastCliente || r.cliente || "");
+      document.getElementById("f_produto").value = (overlay?.lastProduto || r.produto || "");
+      document.getElementById("f_situacao").value = (overlay?.lastSituacao || r.situacaoRO || "");
 
-      document.getElementById("f_cliente").value = cliente;
-      document.getElementById("f_produto").value = produto;
+      // Qtd FP: Evento 2 usa base + overlay; Evento 1 só overlay
+      document.getElementById("f_qtdfp").value = String(qtdFPDisplay(r, overlay));
 
-      // situação: se overlay tiver, usa. Senão, tenta casar com lista fixa.
-      const sit = (overlay?.lastSituacao || r.situacaoRO || "");
-      document.getElementById("f_situacao").value = sit;
+      // Último FP (date): overlay ISO > base BR
+      const baseISO = r.ultFP ? parseDataBRtoISO(r.ultFP) : "";
+      document.getElementById("f_ultfp").value = overlay?.lastDateISO || baseISO || "";
 
-      document.getElementById("f_qtdfp").value = String(overlay?.count || 0);
-      document.getElementById("f_ultfp").value = overlay?.lastDateISO || "";
+      // Coment: Evento 2 pode vir preenchido (overlay > base); Evento 1 deixa em branco
+      if(Number(state.evento) === 2){
+        document.getElementById("f_coment").value = (overlay?.lastComent || r.comentQualidade || "");
+      }else{
+        document.getElementById("f_coment").value = "";
+      }
 
-      document.getElementById("f_coment").value = "";
       document.getElementById("saveHint").textContent = `RO selecionada: ${selectedRO} · Evento ${state.evento}`;
     }
 
@@ -888,10 +964,14 @@
     }
 
     // =========================
-    // SAVE (append em registros.csv via GitHub API)
+    // SAVE
     // =========================
     document.getElementById("btnSave").addEventListener("click", saveRegistro);
     document.getElementById("btnExport").addEventListener("click", exportRegistrosCSV);
+
+    function findBaseRowByRO(ro){
+      return state.dados.find(x => String(x.numeroRO||"").trim() === String(ro||"").trim()) || null;
+    }
 
     async function saveRegistro(){
       const cfg = loadCfg();
@@ -899,14 +979,14 @@
 
       const ro = limparCampo(document.getElementById("f_ro").value);
       if(!ro){
-        document.getElementById("saveHint").innerHTML = `<span class="danger">Selecione uma RO primeiro.</span>`;
+        document.getElementById("saveHint").innerHTML = `<span class="danger">Selecione uma RO na lista primeiro.</span>`;
         return;
       }
 
       const cliente  = limparCampo(document.getElementById("f_cliente").value);
       const produto  = limparCampo(document.getElementById("f_produto").value);
       const situacao = limparCampo(document.getElementById("f_situacao").value);
-      const ultfpISO = limparCampo(document.getElementById("f_ultfp").value); // yyyy-mm-dd
+      const ultfpISO = limparCampo(document.getElementById("f_ultfp").value);
       const coment   = limparCampo(document.getElementById("f_coment").value);
 
       const timestampISO = new Date().toISOString();
@@ -924,14 +1004,26 @@
         safeCSV(coment)
       ].join(";");
 
-      // sem token: orienta export manual
+      // sem token: salva em memória e orienta export
       if(!cfg.token){
         document.getElementById("saveHint").innerHTML =
           `<span class="warn">Token não configurado.</span> Use <b>Exportar registros (CSV)</b> e faça upload manual do arquivo <b>${cfg.path}</b> no repo <b>${cfg.owner}/${cfg.repo}</b>.`;
+
         state.registros.push({ timestampISO, evento, numeroRO: ro, cliente, produto, situacaoRO: situacao, ultFP_iso: ultfpISO, coment });
         state.registrosByRO = indexRegistros(state.registros);
+
+        // ✅ regra: salvou no evento 1 -> passa a ser evento 2 (no tabulador)
+        if(evento === 1){
+          state.movedTo2[ro] = true;
+          updateCountsHome();
+          // remove da lista atual automaticamente
+          state.dadosEvento = state.dados.filter(r => getEffectiveUltSts(r) === 1);
+        }
+
+        // atualiza tela
+        const baseRow = findBaseRowByRO(ro) || { qtdFP:"0", ultFP:"", comentQualidade:"" };
+        document.getElementById("f_qtdfp").value = String(qtdFPDisplay(baseRow, state.registrosByRO[ro]||null));
         renderTabela();
-        document.getElementById("f_qtdfp").value = String(state.registrosByRO[ro]?.count || 0);
         return;
       }
 
@@ -940,6 +1032,8 @@
 
       try{
         const apiBase = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${cfg.path}`;
+
+        // 1) Ler arquivo atual
         let currentContent = "";
         let sha = null;
 
@@ -963,6 +1057,7 @@
           throw new Error(`Falha ao ler arquivo (${getResp.status}): ${txt}`);
         }
 
+        // 2) Montar novo conteúdo
         let next = (currentContent || "").trim();
         if(!next){
           next = header + "\n" + newLine + "\n";
@@ -976,6 +1071,7 @@
           next += newLine + "\n";
         }
 
+        // 3) Commit via PUT
         const putBody = {
           message: `Registro RO ${ro} (Evento ${evento})`,
           content: btoa(unescape(encodeURIComponent(next))),
@@ -998,13 +1094,29 @@
           throw new Error(`Falha ao gravar (${putResp.status}): ${txt}`);
         }
 
+        // 4) Atualiza memória local e tela
         state.registros.push({ timestampISO, evento, numeroRO: ro, cliente, produto, situacaoRO: situacao, ultFP_iso: ultfpISO, coment });
         state.registrosByRO = indexRegistros(state.registros);
 
-        document.getElementById("saveHint").innerHTML = `<span class="ok">Salvo com sucesso!</span> O Dashboard pode refletir essa atualização assim que ele recarregar o overlay.`;
-        document.getElementById("f_qtdfp").value = String(state.registrosByRO[ro]?.count || 0);
+        // ✅ regra: salvou no evento 1 -> passa a ser evento 2 (no tabulador)
+        if(evento === 1){
+          state.movedTo2[ro] = true;
+          updateCountsHome();
+          // remove imediatamente da lista do evento 1
+          state.dadosEvento = state.dados.filter(r => getEffectiveUltSts(r) === 1);
+          document.getElementById("saveHint").innerHTML =
+            `<span class="ok">Salvo com sucesso!</span> Esta RO agora passa a aparecer como <b>Evento 2</b> no Tabulador.`;
+        }else{
+          document.getElementById("saveHint").innerHTML =
+            `<span class="ok">Salvo com sucesso!</span> O Dashboard pode refletir essa atualização assim que ele recarregar o overlay.`;
+        }
 
-        document.getElementById("f_coment").value = "";
+        const baseRow = findBaseRowByRO(ro) || { qtdFP:"0", ultFP:"", comentQualidade:"" };
+        document.getElementById("f_qtdfp").value = String(qtdFPDisplay(baseRow, state.registrosByRO[ro]||null));
+
+        // limpa comentário (pra próxima) - mantém preenchido se você quiser continuar editando? aqui vou manter o que você digitou:
+        // document.getElementById("f_coment").value = "";
+
         renderTabela();
 
       }catch(err){
@@ -1112,7 +1224,9 @@
       setTokenState();
     });
 
-    // init
+    // =========================
+    // INIT
+    // =========================
     loadAll().catch(err=>{
       console.error(err);
       document.getElementById("loadState").textContent = "erro";
